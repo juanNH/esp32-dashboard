@@ -3,8 +3,14 @@ import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import Reading from "@/models/Reading";
 
+// Pequeño GET para probar desde el navegador
+export async function GET() {
+  return NextResponse.json({ ok: true, message: "telemetry api alive" });
+}
+
 export async function POST(req: Request) {
   await connectDB();
+
   const body = await req.json();
   const { id, humidity, temperature } = body;
 
@@ -32,5 +38,9 @@ export async function POST(req: Request) {
 
   const alertTemp = avgTemp;
 
-  return NextResponse.json({ ok: true, alertTemp, readingId: reading._id });
+  return NextResponse.json({
+    ok: true,
+    alertTemp,
+    readingId: reading._id.toString(),
+  });
 }
