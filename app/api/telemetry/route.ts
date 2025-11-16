@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import Reading from "@/models/Reading";
+import Alert from "@/models/Alert";
 
 // Pequeño GET para probar desde el navegador
 export async function GET() {
@@ -36,11 +37,20 @@ export async function POST(req: Request) {
     temperature.reduce((acc: number, v: number) => acc + v, 0) /
     Math.max(temperature.length, 1);
 
-  const alertTemp = avgTemp;
+  const alertTemp = user.alertTemp ?? 30;
+  const isAlert = avgTemp > alertTemp;
+
+  if (isAlert) {
+    await Alert.create({
+      userId: user._id,
+      deviceId: id,
+      avgTemperature: avgTemp,
+    });
+  }
 
   return NextResponse.json({
     ok: true,
-    alertTemp,
+    isAlert,
     readingId: reading._id,
   });
 }
