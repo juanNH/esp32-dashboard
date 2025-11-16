@@ -41,6 +41,6 @@ export async function POST(req: Request) {
   return NextResponse.json({
     ok: true,
     alertTemp,
-    readingId: reading._id.toString(),
+    readingId: reading._id,
   });
 }
