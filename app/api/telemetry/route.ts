@@ -33,12 +33,17 @@ export async function POST(req: Request) {
     temperature,
   });
 
+  const temperatureArr = temperature.filter((v: number | null) => typeof v === "number" && Number.isFinite(v));
+
   const avgTemp =
-    temperature.reduce((acc: number, v: number) => acc + v, 0) /
-    Math.max(temperature.length, 1);
+  temperatureArr.length > 0
+    ? temperatureArr.reduce((acc: number, v: number) => acc + v, 0) /
+      temperatureArr.length
+    : null;
+
 
   const alertTemp = user.alertTemp ?? 30;
-  const isAlert = avgTemp > alertTemp;
+  const isAlert = avgTemp !== null && avgTemp > alertTemp;
 
   if (isAlert) {
     await Alert.create({
@@ -51,6 +56,7 @@ export async function POST(req: Request) {
   return NextResponse.json({
     ok: true,
     isAlert,
+    avgTemperature: avgTemp,
     readingId: reading._id,
   });
 }
